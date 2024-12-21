@@ -1,0 +1,85 @@
+:lang: en
+:source-highlighter: pygments
+:icons: font
+:xrefstyle: short
+
+
+
+=== https://www.cs.swarthmore.edu/~chaganti/cs88/f22/index.html[CS88] Lab-Worksheet https://www.cs.swarthmore.edu/~chaganti/cs88/f22/labs/lab0.html[Lab1: Buffer Overflow]
+
+*Checkpoint Due Date: Tuesday, September 13, 11:59 PM*
+
+
+Draw the stack diagram when `bof` is called `stack.c` with a valid input size. You can assume that the `strcpy` instruction has just completed, and `eip` points to the next assembly instruction after the call to `strcpy`. To create/update the figure below you can use https://asciiflow.com/ to do some fancy ascii art.
+
+Using `gdb` to update the figure below with the contents of the following regions in main memory:
+
+ * the memory addresses, and the values at the memory addresses for `ebp`, `saved eip` and `esp` for each of the stack frames: `main`, `dummy_function` and `bof`
+ * the location of the function arguments for each of the stack frames
+ * the approximate location of the local variables.
+ * note: You don't have to show the location of the BUF_SIZE macro in main memory.
+
+
+
+               ┌──────────────────────────────────────┐◄────────
+               │                                      │ esp = 0xffffce50
+               │  buffer 0xffffce5c                   │
+               │                                      │
+               │                                      │
+               │                                      │
+bof            │                                      │
+               │                                      │
+               │                                      │
+               │                                      │
+               │                                      │
+               ├──────────────────────────────────────┤◄─────────
+               │ saved ebp 0xffffd2d8                 │ ebp = 0xffffcec8
+               ├──────────────────────────────────────┤
+               │ saved eip 0x565563ee                 │
+               ├──────────────────────────────────────┤
+               │ *str -> 0xffffd2f3                   │
+               ├──────────────────────────────────────┼──────────
+               │                                      │ esp = 0xffffcee0
+dummy_func     │ dummy_buffer 0xffffcee0              │
+               │                                      │
+               │                                      │
+               │                                      │
+               │                                      │
+               ├──────────────────────────────────────┤◄─────────
+               │ saved ebp = 0xffffd508               │ ebp = 0xffffd2d8
+               ├──────────────────────────────────────┤
+               │ saved eip = 0x565556382              │
+               ├──────────────────────────────────────┤
+               │ *str -> 0xffffd2f3                   │
+               ├──────────────────────────────────────┤◄─────────
+               │                                      │ esp = 0xffffd2e0
+               │ length 0xffffd2a4                    │
+               │                                      │
+main           │ badfile 0xffffd4bc                   │
+               │                                      │
+               │ str 0xffffd2f3                       │
+               │                                      │
+               │                                      │
+               │                                      │
+               │                                      │
+               │                                      │
+               ├──────────────────────────────────────┤ ◄───────
+               │ saved ebp = 0x0                      │ ebp = 0xffffd508
+               ├──────────────────────────────────────┤
+               │ saved eip = 0xf7debee5               │
+               ├──────────────────────────────────────┤
+               │ argc = 0x1                           │                      
+               ├──────────────────────────────────────┤
+               │ argv = 0xffffd5b4                    │
+               └──────────────────────────────────────┘
+
+                 ┌────────────────────┐
+                 │esp 0xffffce50      │
+                 │                    │
+                 ├────────────────────┤
+   registers     │ebp 0xffffcec8      │
+                 │                    │
+                 ├────────────────────┤
+                 │eip 0x565562dc      │
+                 │                    │
+                 └────────────────────┘

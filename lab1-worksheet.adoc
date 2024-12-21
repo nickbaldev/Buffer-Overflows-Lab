@@ -1,0 +1,94 @@
+:lang: en
+:source-highlighter: pygments
+:icons: font
+:xrefstyle: short
+
+
+
+=== https://www.cs.swarthmore.edu/~chaganti/cs88/f22/index.html[CS88] Lab-Worksheet https://www.cs.swarthmore.edu/~chaganti/cs88/f22/labs/lab0.html[Lab1: Buffer Overflow]
+
+*Lab Due Date: Tuesday, September 20, 11:59 PM*
+
+* Show the contents of your payload and reasoning for it for each level of the exploit. To create a figure similar to the one below you can use https://asciiflow.com/#/
+
+*Level 1: Payload construction*
+
+* Description of payload: 112 NOPs as filler, then overwrite saved eip with desired return address (4 bytes), 184 NOPs for sled, then shellcode
+* Index of eip in the payload: 112
+* Memory address that eip points to in the payload: 0xffffcefe (+200) for gdb
+* Location of the shellcode in main memory: buffer[0] + 300 = 0xffffcf88
+
+
+* This looks better in a text editor.
+
+0xffffce5c        0xffffcecc   0xffffced0            0xffffcf88
+    │                  │            │                      │
+    │                  │            │                      │
+    ▼                  ▼            ▼                      ▼
+    ┌──────────────────┬────────────┬──────────────────────┬─────────┐
+    │                  │ret         │                      │         │
+    │    112 NOPs      │address     │ 184   NOPs           │shellcode│
+    │                  │0xffffcefe  │                      │         │
+    │                  │            │                      │         │
+    └──────────────────┴────────────┴──────────────────────┴─────────┘
+
+*Level 2: Payload construction*
+
+* Description of payload: 53 return addresses (4 bytes each) to cover range of possible locations of saved eip, 200 NOPs for sled, then shellcode
+* Index of eip in the payload: Not set (112 - 212 due to randomization)
+* Memory address that eip points to in the payload: 0xffffcebc (+200 for gdb)
+* Location of the shellcode in main memory: Variable (payload[412])
+
+                                    payload[412]
+payload[0]       payload[212]                 │
+         │                  │                 │
+         │                  │                 │
+         ▼                  ▼                 ▼
+         ┌──────────────────┬─────────────────┬──────────┐
+         │ return addresses │ 200 NOPs        │ shellcode│
+         │                  │                 │          │
+         │ 0xffffcebc x 53  │                 │          │
+         │                  │                 │          │
+         └──────────────────┴─────────────────┴──────────┘
+         
+
+
+*Level 3: Output after running the brute force attack*
+
+* Which payload did you use from your previous exploits?
+We used the same payload as Level 1. 
+
+* Paste the output below from your brute force attack, including timing information.
+
+./brute-force.sh: line 15: 2495366 Segmentation fault      ./stack-L1
+1 minutes and 22 seconds elapsed.
+The program has been running 183757 times so far.
+Input size: 327
+$ 
+
+
+*Level 4: Payload construction*
+
+* Description of payload: 22 NOPs, followed by the desired return address to overwrite saved eip, then 102 NOPS for sled, followed by shellcode.
+* Index of eip in the payload: payload[22] 
+* Memory address that eip points to in the payload: 0xffffcea6 (+200 for gdb)
+* Location of the shellcode in main memory: buffer[0] + 128 = 0xffffcef6
+
+
+
+
+* This looks better in a text editor.
+
+0xffffce76       0xffffce8c  0xffffce90   0xffffcef6
+    │                 │          │               │
+    │                 │          │               │
+    ▼                 ▼          ▼               ▼
+    ┌─────────────────┬──────────┬───────────────┬───────────┐
+    │                 │          │               │           │
+    │ 22 NOPs         │ret       │ 102 NOPs      │shellcode  │
+    │                 │address   │               │           │
+    │                 │0xffffcea6│               │           │
+    └─────────────────┴──────────┴───────────────┴───────────┘
+    
+
+
